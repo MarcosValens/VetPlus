@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="taula"></div>
+<script type="module">
+    import {getAnimals} from "./service/animalService.js";
+    import {confirmar} from "./service/animalService.js";
+    import {getById} from "./service/animalService.js";
+
+    (async function () {
+        let i = 0;
+        let animals = await getAnimals();
+        let table = '<table>';
+        table += '<tr>';
+        table += '<th>Nom</th>';
+        table += '<th>Sexe</th>';
+        table += '<th>Numero de registre</th>';
+        table += '<th>Tipus</th>';
+        table += '</tr>';
+
+        animals.forEach(function (a) {
+            table += '<tr>';
+            table += '<td>' + a.nom + '</td>';
+            table += '<td>' + a.sexe + '</td>';
+            table += '<td>' + a.numreg + '</td>';
+            table += '<td>' + a.tipus + '</td>';
+            table += '<td><a href="animalForm.html?identificador=' + a.id + '">Edita</a></td>';
+            table += '<td><button id="' + i + '" value="' + a.id + '">Borrar</button></td>';
+            table += '</tr>';
+            i++;
+        });
+        table += '<a href="animalForm.html">Nuevo Animal</a>';
+        document.querySelector('#taula').innerHTML = table;
+        let buttons = document.querySelectorAll('button');
+        for (let j = 0; j < buttons.length; j++) {
+            let valueButton = buttons[j].value;
+            document.getElementById(''+j+'').addEventListener("click", async function(){
+                let animal = await getById(valueButton);
+                confirmar(animal)
+            })
+        }
+    })();
+    //como volver a pintar la tabla una vez eliminado el animal??
+</script>
+</body>
+</html>

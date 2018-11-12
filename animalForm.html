@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--vista >> (controlador) >> servicio >> modelo-->
+<!--python -m SimpleHTTPServer-->
+<head>
+    <meta charset="UTF-8">
+    <title>Animal Form</title>
+</head>
+<body>
+<form id="form"></form>
+
+<script type="module">
+    import {getById} from "./service/animalService.js";
+    import {tipus as ts} from "./service/tipusService.js";
+    import {getAnimals} from "./service/animalService.js";
+    import {accion} from "./service/animalService.js";
+    let urlSelf = new URL(document.location);
+    let idAnimal = urlSelf.searchParams.get("identificador");
+
+    /*window.esliceu = update;
+    window.update = function update() {
+        console.log("update")
+    };*/
+
+    /*document.querySelector("#enviar").addEventListener('click', function () {
+        console.log('Update!!');
+    })*/
+    //pintado de la web junto a la lista dinamica
+    (async function () {
+        let tipus = await ts();
+
+        let Animal = await getById(idAnimal);
+
+
+        let form = '<label for="nom">Nombre</label>';
+        form += '<input type="text" id="nom" value="'+Animal.nom+'">';
+        form += '<label for="MASC">Masculino</label>';
+        form += '<input type="radio" name="sex" value="MASC" id="MASC">';
+        form += '<label for="FEM">Femenino</label>';
+        form += '<input type="radio" name="sex" value="FEM" id="FEM">';
+        form += '<label for="reg">Registro</label>';
+        form += '<input type="text" id="reg">';
+        form += '<select id="tipos">';
+        tipus.forEach(function (tipo) {
+            form += '<option value='+tipo.id+'>' + tipo.nom + '</option>';
+        });
+        form += '</select>';
+        form += '<input type="button" id="enviar" value="Enviar"></button>';
+        document.querySelector('#form').innerHTML = form;
+        let inputs = document.querySelectorAll('input');
+        let button = document.querySelector('#enviar');
+        button.disabled = true;
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('input',() => {
+                let values = [];
+                inputs.forEach(valor =>values.push(valor.value));
+                if (!values.includes('') &&  inputs[1].checked || !values.includes('') &&  inputs[2].checked) {button.disabled = false}
+            })
+        }
+        console.log(tipus);
+        console.log(await getAnimals());
+        document.getElementById('enviar').addEventListener('click',function(){
+            accion(idAnimal)
+        });
+
+    })();
+
+
+
+
+
+
+
+</script>
+</body>
+</html>
