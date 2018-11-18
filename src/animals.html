@@ -8,6 +8,55 @@
 <body>
 <header><h1>VetPlus+</h1></header>
 <div id="taula"></div>
+<script type="text/javascript">
+    function tableToJson(table) {
+        var data = [];
+
+
+        var headers = [];
+        for (var i=0; i<table.rows[0].cells.length; i++) {
+            headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
+        }
+        data.push(headers);
+
+        for (var i=1; i<table.rows.length; i++) {
+
+            var tableRow = table.rows[i];
+            var rowData = {};
+
+            for (var j=0; j<tableRow.cells.length; j++) {
+
+                rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
+
+            }
+
+            data.push(rowData);
+        }
+
+        return data;
+    }
+
+
+    function callme(){
+        var table = tableToJson($('#table-id').get(0));
+        var doc = new jsPDF('l','pt','letter',true);
+
+
+        $.each(table, function(i, row){
+            $.each(row, function(j,cell){
+                if(j=="email" | j==1){
+                    doc.cell(1,10,190,20,cell,i);
+                }
+                else{
+                    doc.cell(1,10,90,20,cell,i);
+                }
+
+            });
+        });
+
+        doc.save('VetPlus.pdf');
+    }
+</script>
 <script type="module">
     import {getAnimals} from "./service/animalService.js";
     import {confirmar} from "./service/utils.js";
@@ -17,7 +66,7 @@
     (async function () {
         let i = 0;
         let animals = await getAnimals();
-        let table = '<table>';
+        let table = '<table id="table-id">';
         table += '<tr>';
         table += '<th>Nom</th>';
         table += '<th>Sexe</th>';
@@ -52,5 +101,7 @@
         }
     })();
 </script>
+<script type="text/javascript" src="js/jquery.js"></script>
+<script type="text/javascript" src="js/jsPDF.js"></script>
 </body>
 </html>
