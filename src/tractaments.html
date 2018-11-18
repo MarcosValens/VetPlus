@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tratamientos</title>
+    <link rel="stylesheet" type="text/css" href="scss/animals.css">
+</head>
+<body>
+<header><h1>VetPlus+</h1></header>
+<div id="taula"></div>
+<script type="module">
+    import {getTractaments} from "./service/tractamentService.js";
+    import {getAnimals} from "./service/animalService.js";
+    import {modificaAnimals} from "./service/animalService.js";
+    import {confirmar, parseInteger} from "./service/utils.js";
+
+
+    (async function () {
+        let animals = await getAnimals();
+        let tractaments = await getTractaments();
+        let animalsAndTractaments = modificaAnimals(animals, tractaments);
+        let i = 0;
+        let table = '<table>';
+        table += '<tr>';
+        table += '<th>id Tractacment</th>';
+        table += '<th>Descripcio</th>';
+        table += '<th>Data</th>';
+        table += '<th>Nom Animal</th>';
+        table += '<th>Registre Animal</th>';
+        table += '<th>Tipus Animal</th>';
+        table += '<th>Editar</th>';
+        table += '<th>Borrar</th>';
+        table += '</tr>';
+        animalsAndTractaments.forEach(function (a) {
+            table += '<tr>';
+            table += '<td><ul>';
+            a.tractaments.forEach(function (t) {
+                table += '<li>';
+                if (!t.idtractament.includes("Sin tratamiento")) {
+                    table += '<input type="checkbox" value="' + t.idtractament + '">'
+                }
+                table += t.idtractament + '</li>';
+            });
+            table += '</ul></td>';
+            table += '<td><ul>';
+            a.tractaments.forEach(function (t) {
+                table += '<li>' + t.descripcio + '</li>';
+            });
+            table += '</ul></td>';
+            table += '<td><ul>';
+            a.tractaments.forEach(function (t) {
+                table += '<li>' + t.data + '</li>';
+            });
+            table += '</ul></td>';
+            table += '<td>' + a.nom + '</td>';
+            table += '<td>' + a.numreg + '</td>';
+            table += '<td>' + a.tipus + '</td>';
+            table += '<td><button id="edit' + i + '" onclick="location.href=\'tractamentsForm.html?identificador=' + a.id + '\'">Edita</button></td>';
+            //SE QUE ESTO ES CUTRE PERO NO CENSEGUIA SELECCIONAR LOS BOTONES CONCATENANDO LAS VARIABLES(DEJO EL INTENTO COMENTADO MAS ABAJO)
+            if (a.tractaments[0].idtractament === "Sin tratamiento") {
+                table += '<td><button id="' + i + '" value="borrar" disabled>Borrar</button></td>';
+            } else {
+                table += '<td><button id="' + i + '" value="borrar">Borrar</button></td>';
+            }
+            table += '</tr>';
+            /*if (a.tractaments[0].idtractament === "Sin tratamiento") {
+                document.getElementById('edit' + i + '\'').disabled=true;
+                document.getElementById('borrar' + i + '\'').disabled=true;
+            }*/
+            i++;
+        });
+        table += '</table>';
+        table += '<button  id="animalForm" onclick="location.href=\'animals.html\'">Animales</button>';
+        document.querySelector('#taula').innerHTML = table;
+        let buttons = document.querySelectorAll('button[value]');
+        for (let j = 0; j < buttons.length; j++) {
+            document.getElementById('' + j + '').addEventListener("click", async function () {
+                let select = document.querySelectorAll('input');
+                let values = parseInteger(select);
+                await confirmar(values);
+
+            })
+        }
+    })();</script>
+</body>
+</html>
