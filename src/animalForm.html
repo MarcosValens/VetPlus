@@ -1,7 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<!--vista >> (controlador) >> servicio >> modelo-->
-<!--python -m SimpleHTTPServer-->
 <head>
     <meta charset="UTF-8">
     <title>Animal Form</title>
@@ -11,9 +9,9 @@
 <header><h1>VetPlus+</h1></header>
 <form id="form"></form>
 <script type="module">
-    import {getById} from "./service/animalService.js";
+    import {getById, updateAnimal, insertAnimal} from "./service/animalService.js";
     import {tipus as ts} from "./service/tipusService.js";
-    import {accion, animalsGo} from "./service/utils.js";
+
     //COGE EL VALOR DE PARAMETRO IDENTIFICADOR DE LA URL
     let urlSelf = new URL(document.location);
     let idAnimal = urlSelf.searchParams.get("identificador");
@@ -37,8 +35,9 @@
         });
         form += '</select>';
         form += '<input type="button" id="enviar" value="Enviar"></button>';
-        form += '<button id="animalsGo">Volver</button>';
+        form += '<button formaction="animals.html">Volver</button>';
         document.querySelector('#form').innerHTML = form;
+
         //COMPRUEBA SI ESTAN TODOS LOS CAMPOS RELLENADOS
         let inputs = document.querySelectorAll('input');
         let button = document.querySelector('#enviar');
@@ -51,10 +50,13 @@
             })
         }
         document.getElementById('enviar').addEventListener('click', async function () {
-            await accion(animal)
-        });
-        document.getElementById('animalsGo').addEventListener('click', function () {
-            animalsGo();
+            if (idAnimal === null) {
+                await insertAnimal();
+                window.location.href = "animals.html";
+            } else {
+                await updateAnimal(animal);
+                window.location.href = "animals.html";
+            }
         });
     })();
 </script>

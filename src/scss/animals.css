@@ -1,15 +1,17 @@
 @import url('https://fonts.googleapis.com/css?family=Questrial');
 @import url('https://fonts.googleapis.com/css?family=Luckiest+Guy');
+
 @font-face {
     font-family: 'Questrial', sans-serif;
     font-family: 'Luckiest Guy', cursive;
 }
+
 body {
     margin: 0;
-    padding:0;
+    padding: 0;
     background-color: #7db728;
     text-align: center;
-    font-family:Questrial
+    font-family: Questrial
 }
 
 header {
@@ -21,30 +23,30 @@ header {
     width: 100%;
 }
 
-h1{
+h1 {
     margin-left: 5vw;
 }
 
-table{
+table {
     margin: 0 auto;
     width: 90vw;
 }
 
-tbody tr:nth-child(odd){
+tbody tr:nth-child(odd) {
     background-color: #3d6fc4;
     color: #fff;
 }
 
-tbody tr:nth-child(odd):hover{
+tbody tr:nth-child(odd):hover {
     background-color: #27477d;
     color: #fff;
 }
 
-tbody tr:nth-child(even){
+tbody tr:nth-child(even) {
     background-color: white;
 }
 
-tbody tr:nth-child(even):hover{
+tbody tr:nth-child(even):hover {
 
     background-color: #c6c6c6;
 }
@@ -52,25 +54,29 @@ tbody tr:nth-child(even):hover{
 th {
     background-color: #3d6fc4;
     height: 6vh;
-    font-size:25px
+    font-size: 25px
 
 }
 
-li{
+ul {
+    margin: 0;
+}
+
+li {
     list-style-type: none;
 }
 
-table button{
+table button {
     width: 100%;
 }
 
-input[type=checkbox]{
-    margin-right: 1vw;
+input[type=checkbox] {
+    margin: 0 1vw 0 0;
 }
 
 form {
     display: flex;
-    background-color:#3d6fc4;
+    background-color: #3d6fc4;
     width: 50vw;
     margin: 5vh auto;
     height: 40vh;
@@ -80,18 +86,21 @@ form {
     padding: 5vw;
     justify-content: center;
 }
+
 form div {
-    flex-grow:3;
+    flex-grow: 3;
 
     display: inline;
 }
-form button, form select, form input{
+
+form button, form select, form input {
     margin: 2vw;
 }
-label{
+
+label {
     color: white;
 }
 
-#animalForm {
+#botones button {
     margin: 2vw;
 }

@@ -8,70 +8,19 @@
 <body>
 <header><h1>VetPlus+</h1></header>
 <div id="taula"></div>
-<script type="text/javascript">
-    function tableToJson(table) {
-        var data = [];
-
-
-        var headers = [];
-        for (var i=0; i<table.rows[0].cells.length; i++) {
-            headers[i] = table.rows[0].cells[i].innerHTML.toLowerCase().replace(/ /gi,'');
-        }
-        data.push(headers);
-
-        for (var i=1; i<table.rows.length; i++) {
-
-            var tableRow = table.rows[i];
-            var rowData = {};
-
-            for (var j=0; j<tableRow.cells.length; j++) {
-
-                rowData[ headers[j] ] = tableRow.cells[j].innerHTML;
-
-            }
-
-            data.push(rowData);
-        }
-
-        return data;
-    }
-
-
-    function callme(){
-        var table = tableToJson($('#table-id').get(0));
-        var doc = new jsPDF('l','pt','letter',true);
-
-
-        $.each(table, function(i, row){
-            $.each(row, function(j,cell){
-                if(j=="email" | j==1){
-                    doc.cell(1,10,190,20,cell,i);
-                }
-                else{
-                    doc.cell(1,10,90,20,cell,i);
-                }
-
-            });
-        });
-
-        doc.save('VetPlus.pdf');
-    }
-</script>
 <script type="module">
-    import {getAnimals} from "./service/animalService.js";
-    import {confirmar} from "./service/utils.js";
-    import {getById} from "./service/animalService.js";
-
+    import {getAnimals, deleteAnimal} from "./service/animalService.js";
+    import {deleteTractament} from "./service/tractamentService.js";
 
     (async function () {
         let i = 0;
         let animals = await getAnimals();
         let table = '<table id="table-id">';
         table += '<tr>';
-        table += '<th>Nom</th>';
-        table += '<th>Sexe</th>';
-        table += '<th>Numero de registre</th>';
-        table += '<th>Tipus</th>';
+        table += '<th>Nombre</th>';
+        table += '<th>Sexo</th>';
+        table += '<th>Numero de registro</th>';
+        table += '<th>Tipo</th>';
         table += '<th>Editar</th>';
         table += '<th>Borrar</th>';
         table += '</tr>';
@@ -86,22 +35,44 @@
             table += '</tr>';
             i++;
         });
-        table += '</table>';
+        table += '</table><div id="botones">';
         table += '<button id="animalForm" onclick="location.href=\'animalForm.html\'">Nuevo Animal</button>';
-        table += '<button  id ="tractaments" onclick="location.href=\'tractaments.html\'">Tratamientos</button>';
+        table += '<button id="pdf"><img alt="pdf.icon" height="50px" width="60px" src="https://porkka.com/wp-content/uploads/2017/02/small_export-to-pdf-icon-pdf-export-toolbar-icon.png"></button>';
+        table += '<button  id ="tractaments" onclick="location.href=\'tractaments.html\'">Tratamientos</button></div>';
         document.querySelector('#taula').innerHTML = table;
+
         //AÑADE EL EVENTO A LOS BOTONES DE BORRAR
         let buttons = document.querySelectorAll('button[value]');
         for (let j = 0; j < buttons.length; j++) {
             let valueButton = buttons[j].value;
             document.getElementById('' + j + '').addEventListener("click", async function () {
-                let animal = await getById(valueButton);
-                await confirmar(animal)
+                let animal = animals.filter(animal => animal.id === valueButton);
+                animal = animal[0];
+                let confirmacion = confirm("Eliminar " + animal.nom + "?");
+                if (confirmacion === true) {
+                    let tractaments = animal.tractaments.map(tract => {
+                        return parseInt(tract.idtractament)
+                    });
+                    let eliminaTract = await deleteTractament(tractaments);
+                    Promise.all(eliminaTract)
+                        .then(async x => await deleteAnimal(animal))
+                        .then(y => window.location.href = 'animals.html');
+                }
+                else return false;
             })
         }
+
+        //CREA EL PDF
+        document.getElementById('pdf').addEventListener('click', function () {
+            let doc = new jsPDF();
+            let element = document.getElementById('table-id');
+            let result = doc.autoTableHtmlToJson(element);
+            doc.autoTable(result.columns, result.data);
+            doc.save('VetPlus.pdf');
+        })
     })();
 </script>
-<script type="text/javascript" src="js/jquery.js"></script>
-<script type="text/javascript" src="js/jsPDF.js"></script>
+<script src="js/jspdf.debug.js"></script>
+<script src="js/jspdf.plugin.autotable.js"></script>
 </body>
 </html>

@@ -2,10 +2,6 @@ import {Animal} from "../model/animal.js";
 import {tipus} from "./tipusService.js";
 import {Tractament} from "../model/tractament.js";
 import {getTractaments} from "./tractamentService.js";
-import {deleteTractament} from "./tractamentService.js";
-import {parseInteger} from "./utils.js";
-import {getTractamentById} from "./tractamentService.js";
-
 
 export async function getById(id) {
     let tractaments = await getTractaments();
@@ -49,7 +45,8 @@ export async function getAnimals() {
     });
 
     let animals = await response.json();
-    //INSERTO EL TIPO DE ANIMAL Y LAS VACUNAS QUE TIENE PUESTAS(SI LAS TIENE)
+
+    //INSERTO EL TIPO DE ANIMAL Y LOS TRATAMIENTOS QUE TIENE PUESTAS(SI LAS TIENE)
     animals = animals.map(function (anim) {
         let tipoAnimal = tipoAnims.filter(function (tipo) {
             return tipo.id === anim.idtipus;
@@ -133,15 +130,18 @@ export async function deleteAnimal(animal) {
             id: animal.id,
         }
     };
-    const response = await fetch("http://35.194.72.13/vetplus/serveis.php", {
-        method: 'POST',
-        body: JSON.stringify(objAnimals),
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        }
-    });
+    const response = await
+        fetch("http://35.194.72.13/vetplus/serveis.php", {
+            method: 'POST',
+            body: JSON.stringify(objAnimals),
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            }
+        });
     return await response;
 }
+
+
 //MODIFICA LOS ANIMALES AÑADIENDOLES A CADA UNO SUS TRATAMIENTOS
 export function modificaAnimals(animals, tractaments) {
 
@@ -155,13 +155,9 @@ export function modificaAnimals(animals, tractaments) {
     //CREA UN OBJETO TRACTAMENT VACIO (PARA ANIMALES SIN TRATAMIENTO) Y LO METE EN ANIMALSMODIFICATS
     animalsModificats.forEach(function (a) {
         if (a.tractaments.length === 0) {
-            noTract(a)
+            let noTract = new Tractament(a.id, null, null, null);
+            a.tractaments.push(noTract)
         }
     });
     return animalsModificats;
-}
-//AÑADE UN TRACTAMIENTO NULO A LOSANIMALES QUE NO TIENEN TRATAMIENTOS
-export function noTract(animal) {
-    let noTract = new Tractament(animal.id, null, null, null);
-    animal.tractaments.push(noTract)
 }

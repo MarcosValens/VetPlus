@@ -6,93 +6,91 @@
     <link rel="stylesheet" type="text/css" href="scss/animals.css">
 </head>
 <body>
-<form id="form"></form>
-<script type="module">
-    import {getById, noTract} from "./service/animalService.js";
-    import {getTractaments} from "./service/tractamentService.js";
-    import {accion} from "./service/utils.js";
-    import {animalsGo} from "./service/utils.js";
+<form id="form">
+    <script type="module">
+        import {getById} from "./service/animalService.js";
+        import {getTractaments, insertTractament, updateTractament} from "./service/tractamentService.js";
 
-    //COGE EL VALOR DE PARAMETRO IDENTIFICADOR DE LA URL
-    let urlSelf = new URL(document.location);
-    let idAnimal = urlSelf.searchParams.get("identificador");
-    (async function () {
-        let inputValues = [];
-        let animal = await getById(idAnimal);
-        if (animal.tractaments.length === 0) {
-            noTract(animal)
-        }
-        let tractaments = await getTractaments();
-        let form = '<label for="descripcio">Descripcion</label>';
-        form += '<label for="date">Fecha</label>';
-        form += '<input type="date" id="date" disabled>';
-        form += '<label for="time">Hora</label>';
-        form += '<input type="time" id="time" disabled>';
-        form += '<select id="tractamentsId">';
-        form += '<option value="nuevo tratamiento" selected>Nuevo Tratamiento</option>';
-        animal.tractaments.forEach(function (tract) {
-            form += '<option value=' + tract.idtractament + '>' + tract.idtractament + '</option>';
-        });
-        form += '</select>';
-        form += '<textarea rows="4" cols="50" id="descripcio" placeholder="' + animal.tractaments[0].descripcio + '"></textarea>';
-        form += '<input type="button" id="enviar" value="Enviar" disabled></button>';
-        form += '<button id="animalesGo">Animales</button>';
-        document.querySelector('#form').innerHTML = form;
-        //COMPRUEBA SI ESTAN TODOS LOS CAMPOS RELLENADOS
-        let inputs = document.querySelectorAll('input');
-        let button = document.querySelector('#enviar');
-        let select = document.getElementById('tractamentsId');
-        let date = document.getElementById('date');
-        let time = document.getElementById('time');
-        let textarea = document.getElementById('descripcio');
-        textarea.addEventListener('input', () => {
-            button.disabled = !(textarea.value !== "" && select.value === "nuevo tratamiento");
-        });
-        for (let i = 0; i < inputs.length; i++) {
-            inputs[i].addEventListener('input', () => {
-                inputValues = [];
-                inputs.forEach(valor => inputValues.push(valor.value));
-                if (!inputValues.includes('')) {
+        //COGE EL VALOR DE PARAMETRO IDENTIFICADOR DE LA URL
+        let urlSelf = new URL(document.location);
+        let idAnimal = urlSelf.searchParams.get("identificador");
+        (async function () {
+            let inputValues = [];
+            let animal = await getById(idAnimal);
+            let tractaments = await getTractaments();
+            let form = '<label for="descripcio">Descripcion</label>';
+            form += '<label for="date">Fecha</label>';
+            form += '<input type="date" id="date" disabled>';
+            form += '<label for="time">Hora</label>';
+            form += '<input type="time" id="time" disabled>';
+            form += '<select id="tractamentsId">';
+            form += '<option value="nuevo tratamiento" selected>Nuevo Tratamiento</option>';
+            animal.tractaments.forEach(function (tract) {
+                form += '<option value=' + tract.idtractament + '>' + tract.idtractament + '</option>';
+            });
+            form += '</select>';
+            form += '<textarea rows="4" cols="50" id="descripcio" placeholder="Nuevo tratamiento"></textarea>';
+            form += '<input type="button" id="enviar" value="Enviar"></button>';
+            form += '<button formaction="tractaments.html">Volver</button>';
+            form += '</form>';
+            document.querySelector('#form').innerHTML = form;
+
+            //COMPRUEBA SI ESTAN TODOS LOS CAMPOS RELLENADOS
+            let inputs = document.querySelectorAll('input');
+            let button = document.querySelector('#enviar');
+            let select = document.getElementById('tractamentsId');
+            let date = document.getElementById('date');
+            let time = document.getElementById('time');
+            let textarea = document.getElementById('descripcio');
+            textarea.addEventListener('input', () => {
+                if (!(textarea.value !== "" && select.value === "nuevo tratamiento")) {
                     button.disabled = false
                 }
-            })
-        }
-        document.getElementById('enviar').addEventListener('click', async function () {
-            await accion(animal);
-        });
-        document.getElementById('animalesGo').addEventListener('click',function () {
-           animalsGo();
-        });
-        //CAMBIA EL PLACEHOLDER DEL TEXTAREA SEGUN EL VALOR SELECCIONADO
-        if (idAnimal) {
-            document.getElementById('tractamentsId').addEventListener('change', function () {
-                textarea.value = "";
-                button.disabled = true;
-                let select = document.getElementById('tractamentsId');
-                let actualPh = select.options[select.selectedIndex].value;
-                let ph = tractaments.filter(function (tract) {
-                    return tract.idtractament === actualPh;
-                });
-                if (ph.length > 0) {
-                    document.getElementById('descripcio').placeholder = ph[0].descripcio
-                }
-
             });
-        }
-        select.addEventListener('change', function () {
-            date.disabled = false;
-            time.disabled = false;
-
-            if (select.value === "nuevo tratamiento") {
-                inputValues = [];
-                date.disabled = true;
-                time.disabled = true;
-                button.disabled = false;
-            } else if (select.value === "nuevo tratamiento") {
-                button.disabled = true;
+            for (let i = 0; i < inputs.length; i++) {
+                inputs[i].addEventListener('input', () => {
+                    inputValues = [];
+                    inputs.forEach(valor => inputValues.push(valor.value));
+                    console.log(inputValues);
+                    if (!inputValues.includes('')) {
+                        button.disabled = false
+                    }
+                })
             }
-        })
-    })();
-</script>
+            select.addEventListener('change', function () {
+                date.disabled = false;
+                time.disabled = false;
+                if (select.value === "nuevo tratamiento") {
+                    date.disabled = true;
+                    time.disabled = true;
+                    button.disabled = false;
+                }
+            });
+            document.getElementById('enviar').addEventListener('click', async function () {
+                if (document.getElementById('tractamentsId').value === "nuevo tratamiento") {
+                    await insertTractament(animal);
+                    window.location.href = "tractaments.html";
+                } else {
+                    await updateTractament();
+                    window.location.href = "tractaments.html";
+                }
+            });
+
+            //CAMBIA EL PLACEHOLDER DEL TEXTAREA SEGUN EL VALOR SELECCIONADO
+            if (idAnimal) {
+                document.getElementById('tractamentsId').addEventListener('change', function () {
+                    textarea.value = "";
+                    button.disabled = true;
+                    let select = document.getElementById('tractamentsId');
+                    let actualPh = select.options[select.selectedIndex].value;
+                    let ph = tractaments.filter(tract => tract.idtractament === actualPh);
+                    if (ph.length > 0) {
+                        document.getElementById('descripcio').placeholder = ph[0].descripcio
+                    }
+
+                });
+            }
+        })();
+    </script>
 </body>
 </html>

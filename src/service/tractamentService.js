@@ -23,11 +23,13 @@ export async function getTractaments() {
 
 export async function insertTractament(animal) {
     let date = new Date();
+
     //AÑADE 0 A LOS NUMEROS MENORES DE 10
     Number.prototype.padLeft = function (base, chr) {
         let len = (String(base || 10).length - String(this).length) + 1;
         return len > 0 ? new Array(len).join(chr || '0') + this : this;
     };
+
     //OBTENCION DE LA FECHA Y HORA FORMATEADA
     let dformat = [(date.getFullYear()).padLeft(),
             (date.getMonth() + 1).padLeft(),
@@ -100,12 +102,11 @@ export async function getTractamentById(value) {
             "Content-Type": "application/x-www-form-urlencoded"
         }
     });
-    let tractaments = await response.json();
-    return tractaments;
+    await response.json();
 }
 
 export async function deleteTractament(values) {
-    values.forEach(async idTractament => {
+    return values.map(async idTractament => {
         let objTract = {
             MethodName: 'deleteTractament',
             params: {
