@@ -10,6 +10,7 @@
     <script type="module">
         import {getById} from "./service/animalService.js";
         import {getTractaments, insertTractament, updateTractament} from "./service/tractamentService.js";
+        import {getCurrentTime} from "./service/utils.js";
 
         //COGE EL VALOR DE PARAMETRO IDENTIFICADOR DE LA URL
         let urlSelf = new URL(document.location);
@@ -32,7 +33,6 @@
             form += '<textarea rows="4" cols="50" id="descripcio" placeholder="Nuevo tratamiento"></textarea>';
             form += '<input type="button" id="enviar" value="Enviar"></button>';
             form += '<button formaction="tractaments.html">Volver</button>';
-            form += '</form>';
             document.querySelector('#form').innerHTML = form;
 
             //COMPRUEBA SI ESTAN TODOS LOS CAMPOS RELLENADOS
@@ -43,7 +43,7 @@
             let time = document.getElementById('time');
             let textarea = document.getElementById('descripcio');
             textarea.addEventListener('input', () => {
-                if (!(textarea.value !== "" && select.value === "nuevo tratamiento")) {
+                if ((textarea.value !== "" && select.value === "nuevo tratamiento")) {
                     button.disabled = false
                 }
             });
@@ -68,10 +68,17 @@
             });
             document.getElementById('enviar').addEventListener('click', async function () {
                 if (document.getElementById('tractamentsId').value === "nuevo tratamiento") {
-                    await insertTractament(animal);
+                    let dformat = getCurrentTime();
+                    await insertTractament(animal, dformat);
                     window.location.href = "tractaments.html";
                 } else {
-                    await updateTractament();
+                    let idTractament = document.getElementById('tractamentsId').value;
+                    let descripcio = document.getElementById('descripcio').value;
+                    if (!descripcio) descripcio = document.getElementById('descripcio').placeholder;
+                    let date = document.getElementById('date').value;
+                    let time = document.getElementById('time').value;
+                    let dateTime = date + " " + time + ":00";
+                    await updateTractament(idTractament, descripcio, idAnimal, dateTime);
                     window.location.href = "tractaments.html";
                 }
             });
@@ -92,5 +99,6 @@
             }
         })();
     </script>
+</form>
 </body>
 </html>

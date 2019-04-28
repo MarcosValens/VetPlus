@@ -9,8 +9,9 @@
 <header><h1>VetPlus+</h1></header>
 <form id="form"></form>
 <script type="module">
-    import {getById, updateAnimal, insertAnimal} from "./service/animalService.js";
+    import {getById, updateAnimal, insertAnimal, getAnimals} from "./service/animalService.js";
     import {tipus as ts} from "./service/tipusService.js";
+    import {getListId} from "./service/utils.js";
 
     //COGE EL VALOR DE PARAMETRO IDENTIFICADOR DE LA URL
     let urlSelf = new URL(document.location);
@@ -51,10 +52,27 @@
         }
         document.getElementById('enviar').addEventListener('click', async function () {
             if (idAnimal === null) {
-                await insertAnimal();
+                let nombre = document.getElementById('nom').value;
+                let sexeParam;
+                let reg = document.getElementById('reg').value;
+                if (document.getElementById("MASC").checked) {
+                    sexeParam = document.getElementById("MASC").value;
+                } else sexeParam = document.getElementById("FEM").value;
+                let tipo = document.getElementById('tipos').value;
+                let animales = await getAnimals();
+                let lastId = getListId(animales);
+                await insertAnimal(nombre,sexeParam,reg,tipo,lastId);
                 window.location.href = "animals.html";
             } else {
-                await updateAnimal(animal);
+                let nombre = document.getElementById('nom').value;
+                let sexeParam;
+                let reg = document.getElementById('reg').value;
+                if (document.getElementById("MASC").checked) {
+                    sexeParam = document.getElementById("MASC").value;
+                } else sexeParam = document.getElementById("FEM").value;
+                let tipo = document.getElementById('tipos').value;
+                let id =animal.id;
+                await updateAnimal(id,nombre,sexeParam,reg,tipo);
                 window.location.href = "animals.html";
             }
         });

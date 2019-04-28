@@ -1,5 +1,6 @@
 import {Tractament} from "../model/tractament.js";
 
+
 export async function getTractaments() {
     let objTract = {
         MethodName: 'getTractaments',
@@ -21,23 +22,8 @@ export async function getTractaments() {
     return tractaments;
 }
 
-export async function insertTractament(animal) {
-    let date = new Date();
+export async function insertTractament(animal, dformat) {
 
-    //AÑADE 0 A LOS NUMEROS MENORES DE 10
-    Number.prototype.padLeft = function (base, chr) {
-        let len = (String(base || 10).length - String(this).length) + 1;
-        return len > 0 ? new Array(len).join(chr || '0') + this : this;
-    };
-
-    //OBTENCION DE LA FECHA Y HORA FORMATEADA
-    let dformat = [(date.getFullYear()).padLeft(),
-            (date.getMonth() + 1).padLeft(),
-            date.getDay()].join('/') +
-        ' ' +
-        [date.getHours().padLeft(),
-            date.getMinutes().padLeft(),
-            date.getSeconds().padLeft()].join(':');
     let objTract = {
         MethodName: 'insertTractament',
         params: {
@@ -57,15 +43,8 @@ export async function insertTractament(animal) {
     return await response;
 }
 
-export async function updateTractament() {
-    let idTractament = document.getElementById('tractamentsId').value;
-    let descripcio = document.getElementById('descripcio').value;
-    if (!descripcio) descripcio = document.getElementById('descripcio').placeholder;
-    let urlSelf = new URL(document.location);
-    let idAnimal = urlSelf.searchParams.get("identificador");
-    let date = document.getElementById('date').value;
-    let time = document.getElementById('time').value;
-    let dateTime = date + " " + time + ":00";
+export async function updateTractament(idTractament, descripcio, idAnimal, dateTime) {
+
     let objTract = {
         MethodName: 'updateTractament',
         params: {

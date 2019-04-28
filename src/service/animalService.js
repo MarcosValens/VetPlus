@@ -25,6 +25,7 @@ export async function getById(id) {
         return tract.animal_idanimal === animal.id;
     });
     animal.tractaments = tractaments;
+    console.log(animal)
     return animal;
 }
 
@@ -59,25 +60,12 @@ export async function getAnimals() {
     return animals;
 }
 
-export async function insertAnimal() {
-    let nombre = document.getElementById('nom').value;
-    let sexeParam;
-    let reg = document.getElementById('reg').value;
-    if (document.getElementById("MASC").checked) {
-        sexeParam = document.getElementById("MASC").value;
-    } else sexeParam = document.getElementById("FEM").value;
-    let tipo = document.getElementById('tipos').value;
-    let animales = await getAnimals();
-    let lastId = -1;
-    animales.forEach(function (animal) {
-        if (animal.id > lastId) {
-            lastId = animal.id;
-        }
-    });
+export async function insertAnimal(nombre,sexeParam,reg,tipo,lastId) {
+
     let objAnimals = {
         MethodName: 'insertAnimal',
         params: {
-            id: lastId + 1,
+            id: lastId,
             nom: nombre,
             sexe: sexeParam,
             reg: reg,
@@ -94,19 +82,12 @@ export async function insertAnimal() {
     return await response;
 }
 
-export async function updateAnimal(animal) {
-    let nombre = document.getElementById('nom').value;
-    let sexeParam;
-    let reg = document.getElementById('reg').value;
-    if (document.getElementById("MASC").checked) {
-        sexeParam = document.getElementById("MASC").value;
-    } else sexeParam = document.getElementById("FEM").value;
-    let tipo = document.getElementById('tipos').value;
+export async function updateAnimal(id,nombre,sexeParam,reg,tipo) {
 
     let objAnimals = {
         MethodName: 'updateAnimal',
         params: {
-            id: animal.id,
+            id: id,
             nom: nombre,
             sexe: sexeParam,
             reg: reg,
